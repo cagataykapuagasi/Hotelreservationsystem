@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,20 +14,24 @@ namespace Proje2
         List<Room> listButik = new List<Room>();
         List<Room> listHostel = new List<Room>();
         List<Room> listHotel = new List<Room>();
-        List<Hotel> Hotels = new List<Hotel>();
+        public List<Hotel> Hotels = new List<Hotel>();
 
 
         public LoadHotels()
         {
-            filllistButik();
-            filllistHostel();
-            fillListHotel();
-            fillHotels();
+            getHotels();
         }
 
-        public List<Hotel> getHotels()
+        public void getHotels()
         {
-            return Hotels;
+            string stream_read = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "hotels.txt");
+            Hotels = JsonConvert.DeserializeObject<List<Hotel>>(stream_read);
+        }
+
+        public void saveHotels()
+        {
+            var datas = JsonConvert.SerializeObject(Hotels);
+            File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "hotels.txt", datas);
         }
 
         void fillHotels()

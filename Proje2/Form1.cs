@@ -17,6 +17,7 @@ namespace Proje2
 
         AccountManagement manage = new AccountManagement();
         MainForm main = null;
+        Log log = new Log(); //log nesnesi
 
         public string username;
 
@@ -53,7 +54,7 @@ namespace Proje2
             }
             catch(FormatException ex)
             {
-                Console.WriteLine(ex);
+                log.addLog(ex);
             }
 
 
@@ -99,10 +100,19 @@ namespace Proje2
 
         private void loginAdmin_Click(object sender, EventArgs e)
         {
-            AccountManagement admin = new AccountManagement(true);
-            MainForm main = new MainForm(this, admin);
+            //AccountManagement admin = new AccountManagement(true);
+            AdminForm main = new AdminForm(this);
             this.Hide();
             main.ShowDialog();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            lbltxt.Left = lbltxt.Left - 1; //http://www.simplylearnprogramming.com/text-scrolling-windows-application-csharp/53
+            if (lbltxt.Left + lbltxt.Width <= 0)
+            {
+                lbltxt.Left = this.Width;
+            }
         }
     }
 }

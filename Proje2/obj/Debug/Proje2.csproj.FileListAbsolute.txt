@@ -40,3 +40,4 @@ C:\Users\Cagatay\Desktop\proje2-jonsnow\proje2-jonsnow\Proje2\obj\Debug\Proje2.c
 C:\Users\Cagatay\Desktop\proje2-jonsnow\proje2-jonsnow\Proje2\obj\Debug\Proje2.csproj.CopyComplete
 C:\Users\Cagatay\Desktop\proje2-jonsnow\proje2-jonsnow\Proje2\obj\Debug\Proje2.exe
 C:\Users\Cagatay\Desktop\proje2-jonsnow\proje2-jonsnow\Proje2\obj\Debug\Proje2.pdb
+C:\Users\Cagatay\Desktop\proje2-jonsnow\proje2-jonsnow\Proje2\obj\Debug\Proje2.AdminForm.resources

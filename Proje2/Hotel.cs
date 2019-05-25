@@ -21,10 +21,6 @@ namespace Proje2
             this.city = city;
         }
 
-        public void upFullness()
-        {
-            fullness++;
-        }
 
 
 
@@ -51,6 +47,7 @@ namespace Proje2
         public int Fullness
         {
             get { return fullness; }
+            set { fullness = value; }
         }
     }
 }

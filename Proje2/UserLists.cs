@@ -51,7 +51,15 @@ namespace Proje2
                     currentUser.Name = i.Name;
                     currentUser.Surname = i.Surname;
                     currentUser.PhoneNumber = i.PhoneNumber;
-                    currentUser.ReservationList = i.ReservationList;
+
+                    foreach(Reservation a in i.ReservationList)
+                    {
+                        if ((a.EndDate - DateTime.Now).TotalHours > 0)
+                            currentUser.ReservationList.Add(a);
+                        else
+                            currentUser.HistoryReserve.Add(a);
+                    }
+                    
                     return true;
                 }
 
@@ -97,25 +105,6 @@ namespace Proje2
             foreach (User i in list)
                 Debug.WriteLine(i.PhoneNumber);
 
-            //string js_data = stream_read.ReadToEnd();
-
-
-            //User u = new User("dana");
-            //u.RezervationList.Add(new Reservation());
-            //list.Add(u);
-
-            //User a = new User("lala");
-            //a.RezervationList.Add(new Reservation());
-            //a.RezervationList.Add(new Reservation());
-            //a.RezervationList.Add(new Reservation());
-            //list.Add(a);
-
-            //var deneme = JsonConvert.SerializeObject(list);
-
-            //File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "deneme.txt", deneme);
-
-
-            //Debug.WriteLine(list[0].RezervationList[0].Deneme);
         }
 
         public void saveTxt()

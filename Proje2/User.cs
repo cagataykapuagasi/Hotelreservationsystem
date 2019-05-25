@@ -11,6 +11,7 @@ namespace Proje2
         string username, name, surname,phone;
 
         List<Reservation> reservationList = new List<Reservation>();
+        List<Reservation> historyReserve = new List<Reservation>();
 
         public User(string username)
         {
@@ -21,6 +22,12 @@ namespace Proje2
         {
             get { return reservationList; }
             set { reservationList = value; }
+        }
+
+        public List<Reservation> HistoryReserve
+        {
+            get { return historyReserve; }
+            set { historyReserve = value; }
         }
 
         public string Username

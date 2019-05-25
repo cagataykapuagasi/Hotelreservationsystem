@@ -17,7 +17,7 @@ namespace Proje2
         private CurrentUser user = null;
         LoadHotels hotels = new LoadHotels();
         List<Room> hotelRoom;
-
+        Log log = new Log(); //log nesnesi
 
         public MainForm(Form1 Form1, AccountManagement Manage) //https://stackoverflow.com/questions/7517232/how-to-access-one-object-from-another-form-in-c
         {
@@ -31,13 +31,13 @@ namespace Proje2
             textBoxName.Text = null;
             textBoxSurname.Text = null;
             textBoxPhone.Text = null;
+            hotels.saveHotels();
             listReserve.Items.Clear();
             form1.Show();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            List<Hotel> temp = hotels.getHotels();
             user = manage.currentUser;
             WindowState = FormWindowState.Maximized;
 
@@ -48,13 +48,13 @@ namespace Proje2
                 textBoxSurname.Text = user.Surname;
                 textBoxPhone.Text = user.PhoneNumber;
 
-                this.updateReserveList();
+                updateReserveList();
             }
             
 
             
 
-            foreach(Hotel i in temp)
+            foreach(Hotel i in hotels.Hotels)
             {
                 listHotel.Items.Add(i.HotelName);
             }
@@ -63,12 +63,9 @@ namespace Proje2
 
         private void listHotel_SelectedIndexChanged(object sender, EventArgs e)
         {
-            List<Hotel> temp = hotels.getHotels();
-            
-            labelHotelFullness.Text = temp[listHotel.SelectedIndex].Fullness.ToString();
-            labelHotelStar.Text = temp[listHotel.SelectedIndex].Star.ToString();
+            labelHotelFullness.Text = "%" + hotels.Hotels[listHotel.SelectedIndex].Fullness.ToString();
+            labelHotelStar.Text = hotels.Hotels[listHotel.SelectedIndex].Star.ToString();
             panelHotelInfo.Visible = true;
-
         }
 
         private void buttonInfo_Click(object sender, EventArgs e)
@@ -90,8 +87,7 @@ namespace Proje2
         {
             if(listHotel.SelectedIndex != -1)
             {
-                List<Hotel> temp = hotels.getHotels();
-                hotelRoom = temp[listHotel.SelectedIndex].RoomList;
+                hotelRoom = hotels.Hotels[listHotel.SelectedIndex].RoomList;
 
                 foreach(Room i in hotelRoom)
                 {
@@ -146,10 +142,9 @@ namespace Proje2
             Room room;
             DateTime dateStart;
             DateTime dateEnd;
-            List<Hotel> temp = hotels.getHotels();
-            Hotel hotel = temp[listHotel.SelectedIndex];
+            
 
-            if (radioButton1.Enabled == true)
+            if (radioButton1.Enabled == true) //radiobuttona göre oda tiplerinin doldurulması
                 room = new SingleRoom(hotelRoom[listRooms.SelectedIndex].Floor
                     ,hotelRoom[listRooms.SelectedIndex].No, hotelRoom[listRooms.SelectedIndex].IsFull
                     ,hotelRoom[listRooms.SelectedIndex].IsHaveJacuzzi, false
@@ -174,25 +169,32 @@ namespace Proje2
 
                 dateStart = DateTime.Parse(textBoxStart.Text);
                 dateEnd = DateTime.Parse(textBoxEnd.Text);
-                if((dateEnd - dateStart).TotalHours > 0)
-                {
-                    tempBool = user.makeReservation(dateStart, dateEnd, hotel, room);
+                if((dateEnd - dateStart).TotalHours > 0 //bitiş tarihi başlangıçtan büyük olmalı
+                    && (dateEnd - DateTime.Now).TotalHours > 0 //bitiş ve başlangıç tarihi şuandan büyük olmalı.
+                    && (dateStart - DateTime.Now).TotalHours > 0 &&
+                    hotels.Hotels[listHotel.SelectedIndex].Fullness < 100 ) //Otel dolu olmamalı.
+                {                                                 
+                    tempBool = user.makeReservation(dateStart, dateEnd, hotels.Hotels[listHotel.SelectedIndex], room);
                     if (tempBool)
+                    {
+                        hotels.Hotels[listHotel.SelectedIndex].Fullness++;
+                        labelHotelFullness.Text = hotels.Hotels[listHotel.SelectedIndex].Fullness.ToString();
                         updateReserveList();
+                    }
                     else
-                        MessageBox.Show("Geçerli tarihte oda dolu");
+                        MessageBox.Show("Geçerli tarihte oda dolu.");
                 }
                 else
                 {
-                    MessageBox.Show("Tarihler aynı ya da başlangıç bitişten büyük olamaz");
+                    MessageBox.Show("Tarihler aynı, günümüzden eski ya da başlangıç bitişten büyük olamaz.");
                 }
 
                 
             }
-            catch (FormatException er)
+            catch (FormatException ex)
             {
                 MessageBox.Show("Tarihi uygun formatta yazınız.");
-                //log yazılacak
+                log.addLog(ex);
             }
 
         }
@@ -200,9 +202,17 @@ namespace Proje2
         private void updateReserveList()
         {
             listReserve.Items.Clear();
+            listHistory.Items.Clear();
             foreach (Reservation i in user.ReservationList)
             {
-                listReserve.Items.Add(i.StartDate.ToString("dd/M/yyyy") + "-" + i.EndDate.ToString("dd/M/yyyy") + "-" + i.Hotel.HotelName + "-Rezervasyon numarası: " + i.Id + "-Ücret: " + i.Room.Price);
+                listReserve.Items.Add(i.StartDate.ToString("dd/M/yyyy") + " - " + i.EndDate.ToString("dd/M/yyyy")
+                    + " - " + i.Hotel.HotelName + " - Rezervasyon numarası: " + i.Id + " - Ücret: " + i.Room.Price); //listeye okunur hale getirilir.
+            }
+
+            foreach(Reservation i in user.HistoryReserve)
+            {
+                listHistory.Items.Add(i.StartDate.ToString("dd/M/yyyy") + " - " + i.EndDate.ToString("dd/M/yyyy")
+                    + " - " + i.Hotel.HotelName + " - Rezervasyon numarası: " + i.Id + " - Ücret: " + i.Room.Price); //geçmiş rezervasyonlar yüklenir.
             }
         }
 
@@ -212,6 +222,8 @@ namespace Proje2
             {
                 user.cancelReservation(user.ReservationList[listReserve.SelectedIndex]);
                 updateReserveList();
+                hotels.Hotels[listHotel.SelectedIndex].Fullness--;
+                labelHotelFullness.Text = hotels.Hotels[listHotel.SelectedIndex].Fullness.ToString();
             }
             else
             {
